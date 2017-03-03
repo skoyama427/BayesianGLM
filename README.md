@@ -5,8 +5,8 @@ Easy to understand example of MCMC is [here](http://www.bewersdorff-online.de/am
 ### How to use
 #### Installation
 Clone or download repository and make OUTPUT and DATA directory.  
-Download datafiles(.cef) to /DATA from [the authors repository](https://github.com/linnarsson-lab/ipynb-lamanno2016/tree/master/data).
-Note: If you use unix, these procedure are automated in init.sh.
+Download datafiles(.cef) to /DATA from [the authors repository](https://github.com/linnarsson-lab/ipynb-lamanno2016/tree/master/data).  
+Note: If you use UNIX, these procedure are automated in init.sh.
 
 #### Package Requirement
 Rstan, pipeR, ggplot2, foreach, doParallel
