@@ -13,8 +13,8 @@ Rstan, pipeR, ggplot2, foreach, doParallel
 
 ### Execution
 #### Run MCMC
-Run Estimation.R with some modification.
-As a default, you can obtain maximum a posterior estimation for drawing Fig2G.
+Run Estimation.R with some modification.  
+As a default, you can obtain maximum posterior estimation for Fig2G.
 #### Draw violinplot
 Run violinplot.R
 
