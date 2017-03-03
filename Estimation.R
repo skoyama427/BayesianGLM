@@ -1,64 +1,83 @@
-DAT <- readRDS("../RDS/Mouse_Embryo_fulldataset.RDS")
-  EXPR <- DAT$EXPR
-  INFO <- DAT$INFO
-    CELLTYPE <- INFO$Cell_type
-    CELLEG <- names(table(CELLTYPE))
-    TOTALMOL <- INFO$Total_Molecules
-    NORMALIZE <- tapply(TOTALMOL, CELLTYPE, mean)
-
-#Calc Baseline Expression
-
-FACTORS <- list()
-for(i in 1:length(CELLEG)){
-  TMP <- apply(EXPR[which(CELLTYPE==CELLEG[i], ), ], 1, sum)
-  FACTORS[i] <- mean(TMP)
-}
-FACTORS <- unlist(FACTORS)
-names(FACTORS) <- CELLEG
-
-B0 <- c()
-for(i in 1:nrow(INFO)){
-  TOTMOL <- su(EXPR[i, ])
-  FACTOR <- FACTORS[CELLTYPE[i]]
-  B0[i] <- TOTMOL/FACTOR
-}
-
-#bind Baseline and Gene expression data
-
-X0 <- matrix(0, nrow=nrow(INFO), ncol=length(CELLEG))
-for(i in 1:nrow(INFO)){
-  for(j in 1:length(CELLEG)){
-    if(INFO[i,]$Cell_type == CELLEG[j]){
-      X0[i, j] <-  1
-    }
-  }
-}
-
-saveRDS(CELLEG, "./CELLEG.RDS")
-
+library(pipeR)
 library(rstan)
 library(foreach)
 library(doParallel)
 
-NGENE <- ncol(EXPR)
+source("Ceftools.R")
 
-sm <- stan_model(file="../SCRIPTS/BayesianGLM.stan")
+################
+# Loading Data #
+################
 
-cl <- makeCluster(detectCores())
-registerDoParallel(cl)
+CEF <- readCEF("./Mouse_Embryo_fulldataset.cef")
+READCNT <- CEF$Readcount
+CELLTYP <- CEF$Cell_type
+CELLLEG <- sort(unique(CELLTYP))
+MOLECNT <- apply(READCNT, 2, sum)
 
-foreach(i=1:NGENE, .packages="rstan") %dopar% {
+##########################################################
+# Calculation the sizefactor vector (Cell length vector) #
+##########################################################
 
-  ITERGENE <- colnames(EXPR)[i]
-  X <- cbind(B0, X0)
-  Y <- EXPR[,ITERGENE]
+FACTORS <- list()
 
-  DATA <- list(Y=Y, X=X, N=length(Y), K=ncol(X))
-  OUT <- sampling(sm, data=DATA, iter=1000, chains=2)
-  EXT <- extract(OUT)
-
-  OUTFILE <- paste0("../RDS/MAP/MAP_", ITERGENE, ".RDS", collapse="")
-  saveRDS(EXT, OUTFILE) 
+for(i in 1:length(CELLLEG)){
+  TMP <- apply(READCNT[, which(CELLTYP==CELLLEG[i], )], 2, sum)
+  FACTORS[i] <- mean(TMP)
 }
+FACTORS <- unlist(FACTORS)
+names(FACTORS) <- CELLLEG
+SIZFACT <- MOLECNT/FACTORS[CELLTYP]
+
+
+################################################
+# Create design matrix X(Cell*Celltype matrix) #
+################################################
+
+X0 <- matrix(0, nrow=length(CELLTYP), ncol=length(CELLLEG))
+
+for(i in 1:length(CELLLEG)){
+  X0[CELLTYP==CELLLEG[i], i] <- 1
+}
+colnames(X0) <- CELLLEG
+
+############
+# Run MCMC #
+############
+
+#Try to recapitulate Figure 2G for Mousedataset
+
+X <- cbind(Sz=SIZFACT, X0)
+TGT <- c("Cldn5", "Cd248", "Ccl248", "Ntn1", "Tnc", "Hmgb2", "Neurod1", "Nkx6-2", "Pou4f1", "Gata3", "Th", "Aldh1a1", "Meis2", "Slc6a4", "Isl1")
+TGTGENE <- which(!is.na(match(rownames(READCNT), TGT)))
+
+# If you want whole results, please uncomment below, however, it takes several days.
+# TGTGENE <- 1:nrow(READCNT)
+
+# Compile Stan model
+sm <- stan_model(file="BayesianGLM.stan")
+
+
+# Parallel computation for each gene
+cl <- makeCluster(detectCores())
+
+  registerDoParallel(cl)
+
+  foreach(i=TGTGENE, .packages="rstan") %dopar% {
+
+    GENNAME <- rownames(READCNT)[i]
+    Y <- READCNT[i,]
+
+    DATA <- list(Y=Y, X=X, N=length(Y), K=ncol(X))
+
+    OUT <- sampling(sm, data=DATA, iter=1000, chains=2)
+    BETA <- extract(OUT)$beta
+    colnames(BETA) <- colnames(X)
+    OUTRDS <- paste0("MAP/MAP_", GENNAME, ".RDS", collapse="")
+    saveRDS(BETA, OUTFILE) 
+    OUTCSV <- paste0("MAP/MAP_", GENNAME, ".csv", collapse="")
+    writeCSV(BETA, OUTCSV)
+
+  }
 
 stopCluster(cl)

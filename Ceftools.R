@@ -20,20 +20,11 @@ readCEF <- function(INFILE){
   print("make output list for analysis...")
 
   OUT <- list(CEF             = INFO[[1]],
-              Cell_ID         = INFO[[2]],
-              Cell_type       = INFO[[3]],
-              Timepoint       = INFO[[4]],
+              Cell_ID         = as.character(INFO[[2]]),
+              Cell_type       = as.character(INFO[[3]]),
+              Timepoint       = as.character(INFO[[4]]),
               Readcount       = EXPR)
 
   return(OUT)
 }
-
-INFILE <- "Human_Embryo_fulldataset.cef"
-INFILE <- "Mouse_Embryo_fulldataset.cef"
-INFILE <- "iPSC_fulldataset.cef"
-INFILE <- "ES_fulldataset.cef"
-
-OUT <- readCEF(INFILE)
-OUT$Readcount %>>% hh
-OUT$Readcount %>>% dim
 
