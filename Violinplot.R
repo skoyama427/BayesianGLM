@@ -9,8 +9,6 @@ library(gridExtra)
 # Argument BETA(numeric matrix, iteration * celltype): MAP-beta matrix
 #          TGTCELL(character vector): Names of celltype, to be plotted
 
-
-
 vioPlot <- function(BETA, TGTCELL=FIG2G){
   MBETA <- melt(BETA[,TGTCELL] -1)
   colnames(MBETA) <- c("Cell_type", "beta")
@@ -25,3 +23,5 @@ V1 <- vioPlot(read.csv2("./OUTPUT/MAP_Cldn5.csv"))
 V2 <- vioPlot(read.csv2("./OUTPUT/MAP_Cd248.csv"))
 V3 <- vioPlot(read.csv2("./OUTPUT/MAP_Ccl4.csv"))
 grid.arrange(V1, V2, V3, row=1)
+
+
