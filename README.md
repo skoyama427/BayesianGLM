@@ -9,10 +9,12 @@ Download datafiles(.cef) to /DATA from [the authors repository](https://github.c
 Note: If you use UNIX, these procedure are automated in init.sh.
 
 #### Package Requirement
-Rstan, pipeR, ggplot2, foreach, doParallel
+Rstan, ggplot2, pipeR
+
+option: for parallelization
+foreach, doParallel
 
 ### Execution
 Run "runGLM.R"
 You can modify DATASET/GENESET/CELLTYPESET in the script to create your own plot.
-
 

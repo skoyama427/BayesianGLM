@@ -1,8 +1,6 @@
 library(pipeR)
 library(rstan)
 library(foreach)
-library(doParallel)
-
 
 BayesianGLM <- function(DATASET, TGTGENE, parallel=T){
 
@@ -91,6 +89,8 @@ BayesianGLM <- function(DATASET, TGTGENE, parallel=T){
   # Parallel computation for each gene
 
   if(parallel==T){
+
+    library(doParallel)
 
     cl <- makeCluster(detectCores())
 
