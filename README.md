@@ -9,10 +9,10 @@ Download datafiles(.cef) to /DATA from [the authors repository](https://github.c
 Note: If you use UNIX, these procedure are automated in init.sh.
 
 #### Package Requirement
-Rstan, ggplot2, pipeR
+Rstan, ggplot2, pipeR, foreach
 
 option: for parallelization
-foreach, doParallel
+doParallel
 
 ### Execution
 Run "runGLM.R"
