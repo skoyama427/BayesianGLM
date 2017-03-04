@@ -12,10 +12,7 @@ Note: If you use UNIX, these procedure are automated in init.sh.
 Rstan, pipeR, ggplot2, foreach, doParallel
 
 ### Execution
-#### Run MCMC
-Run Estimation.R with some modification.  
-As a default, you can obtain maximum posterior estimation for Fig2G.
-#### Draw violinplot
-Run violinplot.R
+Run "runGLM.R"
+You can modify DATASET/GENESET/CELLTYPESET in the script to create your own plot.
 
 
