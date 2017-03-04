@@ -32,7 +32,6 @@ FACTORS <- unlist(FACTORS)
 names(FACTORS) <- CELLLEG
 SIZFACT <- MOLECNT/FACTORS[CELLTYP]
 
-
 ################################################
 # Create design matrix X(Cell*Celltype matrix) #
 ################################################
@@ -53,7 +52,6 @@ colnames(X0) <- CELLLEG
 X <- cbind(Sz=SIZFACT, X0)
 TGT <- c("Cldn5", "Cd248", "Ccl4", "Ntn1", "Tnc", "Hmgb2", "Neurod1", "Nkx6-2", "Pou4f1", "Gata3", "Th", "Aldh1a1", "Meis2", "Slc6a4", "Isl1")
 TGTGENE <- which(!is.na(match(rownames(READCNT), TGT)))
-
 # If you want whole results, please uncomment below, however, it takes several days.
 # TGTGENE <- 1:nrow(READCNT)
 
@@ -79,7 +77,7 @@ cl <- makeCluster(detectCores())
     OUTRDS <- paste0("MAP/MAP_", GENNAME, ".RDS", collapse="")
     saveRDS(BETA, OUTRDS) 
     OUTCSV <- paste0("MAP/MAP_", GENNAME, ".csv", collapse="")
-    writeCSV(BETA, OUTCSV)
+    write.csv2(BETA, OUTCSV)
 
   }
 
