@@ -1,5 +1,5 @@
 ## BayesianGLM
-Bayesian generalized linear regression model for estimation of cell-specific gene expression in R and Rstan.[La Manno et al.(Cell,2016)](http://linnarssonlab.org/publications/2016/10/06/midbrain/)  
+Bayesian generalized linear regression model for estimation of cell-specific gene expression in R and Rstan.[La Manno et al.(Cell 2016)](http://linnarssonlab.org/publications/2016/10/06/midbrain/)  
 Easy to understand example of MCMC is [here](http://www.bewersdorff-online.de/amonopoly)
 
 ### How to use
