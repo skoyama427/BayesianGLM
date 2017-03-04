@@ -4,7 +4,7 @@ library(foreach)
 library(doParallel)
 
 
-BayesianGLM <- function(DATASET, TGTGENE){
+BayesianGLM <- function(DATASET, TGTGENE, parallel=T){
 
   stanmodel <- "
 
@@ -90,25 +90,48 @@ BayesianGLM <- function(DATASET, TGTGENE){
 
   # Parallel computation for each gene
 
-  cl <- makeCluster(detectCores())
+  if(parallel==T){
 
-    registerDoParallel(cl)
+    cl <- makeCluster(detectCores())
 
-    foreach(i=TGT, .packages="rstan") %dopar% {
+      registerDoParallel(cl)
 
-      GENNAME <- rownames(READCNT)[i]
-      Y <- READCNT[i,]
+      foreach(i=TGT, .packages="rstan") %dopar% {
 
-      DATA <- list(Y=Y, X=X, N=length(Y), K=ncol(X))
+        GENNAME <- rownames(READCNT)[i]
+        Y <- READCNT[i,]
 
-      OUT <- sampling(sm, data=DATA, iter=1000, chains=2)
-      BETA <- extract(OUT)$beta
-      colnames(BETA) <- colnames(X)
-      OUTCSV <- paste0("OUTPUT/MAP_", GENNAME, ".csv", collapse="")
-      write.csv2(BETA, OUTCSV)
+        DATA <- list(Y=Y, X=X, N=length(Y), K=ncol(X))
+
+        OUT <- sampling(sm, data=DATA, iter=1000, chains=2)
+        BETA <- extract(OUT)$beta
+        colnames(BETA) <- colnames(X)
+        OUTCSV <- paste0("OUTPUT/MAP_", GENNAME, ".csv", collapse="")
+        write.csv2(BETA, OUTCSV)
+
+      }
+
+    stopCluster(cl)
+
+  } else {
+
+  # In case of not working parallelization. specify parallel=F
+    
+    foreach(i=TGT, .packages="rstan") %do% {
+
+          GENNAME <- rownames(READCNT)[i]
+          Y <- READCNT[i,]
+
+          DATA <- list(Y=Y, X=X, N=length(Y), K=ncol(X))
+
+          OUT <- sampling(sm, data=DATA, iter=1000, chains=2)
+          BETA <- extract(OUT)$beta
+          colnames(BETA) <- colnames(X)
+          OUTCSV <- paste0("OUTPUT/MAP_", GENNAME, ".csv", collapse="")
+          write.csv2(BETA, OUTCSV)
 
     }
 
-  stopCluster(cl)
+  }
 
 }
