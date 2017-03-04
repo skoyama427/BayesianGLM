@@ -11,10 +11,10 @@ Note: If you use UNIX, these procedure are automated in init.sh.
 #### Package Requirement
 Rstan, ggplot2, pipeR, foreach
 
-option: for parallelization
+Option for parallelization
 doParallel
 
 ### Execution
-Run "runGLM.R"
+Run "runGLM.R"  
 You can modify DATASET/GENESET/CELLTYPESET in the script to create your own plot.
 
