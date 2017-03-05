@@ -9,7 +9,7 @@ Easy to understand example of MCMC is [here](http://www.bewersdorff-online.de/am
 Note: If you use UNIX, these procedure are automated in init.sh.
 
 #### Package Requirement
-Rstan, ggplot2, pipeR, foreach
+Rstan, ggplot2, pipeR, foreach. reshape2
 
 Option for parallelization
 doParallel
