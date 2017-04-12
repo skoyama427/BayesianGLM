@@ -1,30 +1,32 @@
 readCEF <- function(INFILE){
-
+  require(dplyr)
+  require(tibble)
   print("extract dataset information...")
-
-  INFO <- list()
-  LEG <- read.table(INFILE, nrow=8, fill=T)[,1]
   
-  INFO[[1]] <- read.table(INFILE, skip=(which(LEG=="CEF")      -1), nrow=1) %>>% paste0
-  INFO[[2]] <- read.table(INFILE, skip=(which(LEG=="Cell_ID")  -1), nrow=1)[-1]
-  INFO[[3]] <- read.table(INFILE, skip=(which(LEG=="Cell_type")-1), nrow=1)[-1]
-  INFO[[4]] <- read.table(INFILE, skip=(which(LEG=="Timepoint")-1), nrow=1)[-1]
-
+  LEG <- read.table(INFILE, nrow=8, fill=T,stringsAsFactors = F)[,1]
+  
+  #metadata
+  TMP.INFO <- read.delim(INFILE,nrows = 8,fill = T,stringsAsFactors = F,header=F) %>% select(-V1) %>% filter(V2 %in% LEG) %>% 
+    column_to_rownames("V2") %>% t(.) %>% data.frame(.,stringsAsFactors = F)
+  
+  CEF.info <- read.table(INFILE, skip=(which(LEG=="CEF")-1), nrow=1) %>% paste0  #CEF
+  
   print("making expression matrix...")
-
-  TMP <- read.table(INFILE, skip=(which(LEG=="Gene")))
+  
+  TMP <- read.table(INFILE, skip=(which(LEG=="Gene")), stringsAsFactors = F)
   EXPR <- as.matrix(TMP[,-1])
   rownames(EXPR) <- TMP[,1]
-  colnames(EXPR) <- INFO[[2]]
-
+  colnames(EXPR) <- TMP.INFO$Cell_ID
+  
   print("make output list for analysis...")
-
-  OUT <- list(CEF             = INFO[[1]],
-              Cell_ID         = as.character(INFO[[2]]),
-              Cell_type       = as.character(INFO[[3]]),
-              Timepoint       = as.character(INFO[[4]]),
+  
+  OUT <- list(CEF             = CEF.info,
+              Cell_ID         = TMP.INFO$Cell_ID,
+              Cell_type       = TMP.INFO$Cell_type,
+              Timepoint       = TMP.INFO$Timepoint,
               Readcount       = EXPR)
-
+  
   return(OUT)
 }
+
 
