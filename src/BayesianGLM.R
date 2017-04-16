@@ -1,6 +1,9 @@
 library(pipeR)
 library(rstan)
 library(foreach)
+rstan_options(auto_write = TRUE)
+options(mc.cores = parallel::detectCores())
+
 
 BayesianGLM <- function(DATASET, TGTGENE, parallel=T){
 
@@ -106,9 +109,9 @@ BayesianGLM <- function(DATASET, TGTGENE, parallel=T){
         OUT <- sampling(sm, data=DATA, iter=1000, chains=2)
         BETA <- extract(OUT)$beta
         colnames(BETA) <- colnames(X)
-        OUTCSV <- paste0("OUTPUT/MAP_", GENNAME, ".csv", collapse="")
-        write.csv2(BETA, OUTCSV)
-
+        OUTRDS <- paste0("OUTPUT/MAP_",GENNAME,".rds",collapse="")
+        saveRDS(BETA, OUTRDS,compress = "bzip2")
+        
       }
 
     stopCluster(cl)
@@ -127,9 +130,9 @@ BayesianGLM <- function(DATASET, TGTGENE, parallel=T){
           OUT <- sampling(sm, data=DATA, iter=1000, chains=2)
           BETA <- extract(OUT)$beta
           colnames(BETA) <- colnames(X)
-          OUTCSV <- paste0("OUTPUT/MAP_", GENNAME, ".csv", collapse="")
-          write.csv2(BETA, OUTCSV)
-
+          OUTRDS <- paste0("OUTPUT/MAP_",GENNAME,".rds",collapse="")
+          saveRDS(BETA, OUTRDS,compress = "bzip2")
+          
     }
 
   }
